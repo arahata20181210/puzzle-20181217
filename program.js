@@ -1,10 +1,37 @@
+tblock = [
+    [
+        [0, 0, 0, 0],
+        [1, 1, 1, 0],
+        [0, 1, 0, 0],
+        [0, 0, 0, 0]
+    ],
+    [
+        [0, 1, 0, 0],
+        [0, 1, 1, 0],
+        [0, 1, 0, 0],
+        [0, 0, 0, 0]
+    ],
+    [
+        [0, 1, 0, 0],
+        [1, 1, 1, 0],
+        [0, 0, 0, 0],
+        [0, 0, 0, 0]
+    ],
+    [
+        [0, 1, 0, 0],
+        [1, 1, 0, 0],
+        [0, 1, 0, 0],
+        [0, 0, 0, 0]
+    ],
+];
+
 function ugokasu(e) {
     // 描く先のCanvasを取得
     gamegamen = document.getElementById('game');
     cg = gamegamen.getContext('2d');
 
     // いまのブロックを消す
-    kesu(cg, ix, iy);
+    kesu(cg, ix, iy, imuki);
 
     // [→]キーが押されたかどうか
     if (e.keyCode == 39) {
@@ -13,39 +40,61 @@ function ugokasu(e) {
         // 音を鳴らす
         document.getElementById('kaiten').play();
     }
+    
+    // [←]キーが押されたかどうか
+    if (e.keyCode == 37) {
+        // 左に異動
+        ix = ix - 1;
+        // 音を鳴らす
+        document.getElementById('kaiten').play();
+    }
+
+    // [↑]キーが押されたかどうか
+    if (e.keyCode == 38) {
+        // 回転する
+        imuki = imuki + 1;
+        if (imuki > 3) {
+            imuki = 0;
+        }
+        // 音を鳴らす
+        document.getElementById('kaiten').play();
+    }
+
+    // 新しい場所にブロックを描く
+    kaku(cg, ix, iy, imuki);
+
 }
 
-
-
-function kesu(c, bx, by) {
+function kesu(c, bx, by, muki) {
     // 消す処理にする
     c.globalCompositeOperation = 'destination-out';
     // 描く（実際は消える）
-    kaku(c, bx, by);
+    kaku(c, bx, by, muki);
     // もとの描く処理に戻す
     c.globalCompositeOperation = 'source-over';
 }
 
 
-function kaku(c, bx, by) {
+function kaku(c, bx, by, muki) {
     // ブロックの色と線
     c.fillStyle = '#CC00CC';
     c.strokeStyle = '#333333';
     c.lineWidth = 3;
-    
-    // ブロックを描く
-    // 1つ目
-    c.fillRect(bx * 20, (by + 1) * 20, 20, 20);
-    c.strokeRect(bx * 20, (by + 1) * 20, 20, 20);
-    // 2つ目
-    c.fillRect((bx + 1) * 20, (by + 1) * 20, 20, 20);
-    c.strokeRect((bx + 1) * 20, (by + 1) * 20, 20, 20);
-    // 3つ目
-    c.fillRect((bx + 2) * 20, (by + 1) * 20, 20, 20);
-    c.strokeRect((bx + 2) * 20, (by + 1) * 20, 20, 20);
-    // 4つ目
-    c.fillRect((bx + 1) * 20, (by + 2) * 20, 20, 20);
-    c.strokeRect((bx + 1) * 20, (by + 2) * 20, 20, 20);
+
+    // パターンを決める
+    p = tblock[muki];
+
+    // パターン通りに描く
+    for (n = 0; n < 4; n++) {
+        for (m = 0; m < 4; m++) {
+            // 描くかどうか
+            if (p[n][m] == 1) {
+                // ここに描く
+                    c.fillRect((bx + m) * 20, (by + n) * 20, 20, 20);
+                    c.strokeRect((bx + m) * 20, (by + n) * 20, 20, 20);
+            }
+        }
+    }
     
 }
 
@@ -62,26 +111,9 @@ function gamekaishi() {
     // 左上の座標
     ix = 4;
     iy = 0;
+    imuki = 0;
 
-    kaku(cg, ix, iy);
-
-    // // ブロックの色
-    // cg.fillStyle = '#CC00CC';
-    // cg.strokeStyle = '#333333';
-    // cg.lineWidth = 3;
-
-    // // 1つ目
-    // cg.fillRect(ix * 20, (iy + 1) * 20, 20, 20);
-    // cg.strokeRect(ix * 20, (iy + 1) * 20, 20, 20);
-    // // 2つ目
-    // cg.fillRect((ix + 1) * 20, (iy + 1) * 20, 20, 20);
-    // cg.strokeRect((ix + 1) * 20, (iy + 1) * 20, 20, 20);
-    // // 3つ目
-    // cg.fillRect((ix + 2) * 20, (iy + 1) * 20, 20, 20);
-    // cg.strokeRect((ix + 2) * 20, (iy + 1) * 20, 20, 20);
-    // // 4つ目
-    // cg.fillRect((ix + 1) * 20, (iy + 2) * 20, 20, 20);
-    // cg.strokeRect((ix + 1) * 20, (iy + 2) * 20, 20, 20);
+    kaku(cg, ix, iy, imuki);
 
 }
 
